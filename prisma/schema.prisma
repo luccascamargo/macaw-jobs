@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+  cards         Card[]         @relation("UserCards")
+  boards        BoardUser[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Board {
+  id        String      @id @default(uuid())
+  title     String
+  columns   Column[]
+  users     BoardUser[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model BoardUser {
+  boardId String
+  userId  String
+  board   Board     @relation(fields: [boardId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  role    BoardRole
+
+  @@id([boardId, userId])
+}
+
+model Column {
+  id      String @id @default(uuid())
+  title   String
+  order   Int
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id])
+  cards   Card[] @relation("ColumnCards")
+}
+
+model Card {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  priority    String
+  order       Int
+  columnId    String
+  column      Column   @relation("ColumnCards", fields: [columnId], references: [id])
+  assigneeId  String?
+  assignee    User?    @relation("UserCards", fields: [assigneeId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BoardRole {
+  OWNER
+  MEMBER
+}
