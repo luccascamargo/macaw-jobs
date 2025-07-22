@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
 }
 
 datasource db {
@@ -59,17 +58,18 @@ model Column {
 }
 
 model Card {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  priority    String
-  order       Int
-  columnId    String
-  column      Column   @relation("ColumnCards", fields: [columnId], references: [id])
-  assigneeId  String?
-  assignee    User?    @relation("UserCards", fields: [assigneeId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  priority        String
+  order           Int
+  columnId        String
+  column          Column   @relation("ColumnCards", fields: [columnId], references: [id])
+  assigneeId      String?
+  assignee        User?    @relation("UserCards", fields: [assigneeId], references: [id])
+  markdownContent String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 enum Role {

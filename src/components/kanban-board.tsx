@@ -24,6 +24,7 @@ export interface Task {
   order: number;
   createdAt: string;
   updatedAt: string;
+  markdownContent?: string; // campo opcional para markdown
 }
 
 export interface Column {
@@ -43,7 +44,15 @@ interface KanbanBoardProps {
   refetchBoard?: () => void | Promise<any>;
 }
 
-export function KanbanBoard({ boardId, columns, loading, error, onAddColumn, onAddTask, refetchBoard }: KanbanBoardProps) {
+export function KanbanBoard({
+  boardId,
+  columns,
+  loading,
+  error,
+  onAddColumn,
+  onAddTask,
+  refetchBoard,
+}: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
@@ -72,7 +81,8 @@ export function KanbanBoard({ boardId, columns, loading, error, onAddColumn, onA
     const activeId = active.id as string;
     const overId = over.id as string;
     let fromColumn: Column | undefined, toColumn: Column | undefined;
-    let fromIndex = -1, toIndex = -1;
+    let fromIndex = -1,
+      toIndex = -1;
     for (const col of columns) {
       const idx = col.tasks.findIndex((t) => t.id === activeId);
       if (idx !== -1) {

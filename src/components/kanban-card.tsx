@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GripVertical } from "lucide-react";
 import type { Task } from "./kanban-board";
+import { KanbanCardModal } from "./kanban-card-modal";
+import { useState } from "react";
 
 interface KanbanCardProps {
   task: Task;
@@ -47,48 +49,62 @@ export function KanbanCard({ task }: KanbanCardProps) {
       .toUpperCase();
   };
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      className={`cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md ${
-        isDragging ? "opacity-50" : ""
-      }`}
-          {...listeners}
+    <>
+      <Card
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        className={`cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md ${
+          isDragging ? "opacity-50" : ""
+        }`}
+        {...listeners}
+        onClick={() => setModalOpen(true)}
       >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
-          <div
-            className="cursor-grab active:cursor-grabbing p-1"
-          >
-            <GripVertical className="h-4 w-4 text-gray-400" />
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
+            <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
+            <div className="cursor-grab active:cursor-grabbing p-1">
+              <GripVertical className="h-4 w-4 text-gray-400" />
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        {task.description && (
-          <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-            {task.description}
-          </p>
-        )}
-        <div className="flex items-center justify-between">
-          <Badge
-            variant="secondary"
-            className={`text-xs ${priorityColors[task.priority]}`}
-          >
-            {task.priority}
-          </Badge>
-          {task.assignee && (
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-xs">
-                {getInitials(task.assignee)}
-              </AvatarFallback>
-            </Avatar>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {task.description && (
+            <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+              {task.description}
+            </p>
           )}
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex items-center justify-between">
+            <Badge
+              variant="secondary"
+              className={`text-xs ${
+                priorityColors[task.priority as keyof typeof priorityColors]
+              }`}
+            >
+              {task.priority}
+            </Badge>
+            {task.assignee && (
+              <Avatar className="h-6 w-6">
+                <AvatarFallback className="text-xs">
+                  {getInitials(task.assignee)}
+                </AvatarFallback>
+              </Avatar>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      <KanbanCardModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        initialValue={task.markdownContent || ""}
+        onSave={(value) => {
+          // Aqui você pode chamar a API para salvar o markdown
+          console.log("Salvar markdown:", value);
+        }}
+      />
+    </>
   );
 }
