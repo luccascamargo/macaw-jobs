@@ -14,9 +14,10 @@ import { User } from "@/hooks/useUsers";
 
 interface KanbanCardProps {
   task: Task;
+  boardId: string;
 }
 
-export function KanbanCard({ task }: KanbanCardProps) {
+export function KanbanCard({ task, boardId }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -76,7 +77,7 @@ export function KanbanCard({ task }: KanbanCardProps) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["board", task.columnId] });
+      queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },
   });
 

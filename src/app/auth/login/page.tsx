@@ -1,5 +1,12 @@
-'use client'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+"use client";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -8,10 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "@/hooks/useLogin";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 const schema = z.object({
   email: z.email({ message: "E-mail inválido" }),
-  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  password: z
+    .string()
+    .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -72,6 +82,8 @@ export default function LoginPage() {
           </Button>
         </form>
       </Form>
+      <span>Não possui uma conta?</span>
+      <Link href={"/auth/register"}>Registrar</Link>
     </div>
   );
-} 
+}

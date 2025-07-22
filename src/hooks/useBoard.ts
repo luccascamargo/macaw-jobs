@@ -22,6 +22,7 @@ export interface BoardDetail {
   id: string;
   title: string;
   columns: Column[];
+  users: User[];
 }
 
 export function useBoard(boardId: string | undefined) {

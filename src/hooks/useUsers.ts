@@ -6,17 +6,17 @@ export interface User {
   email: string;
 }
 
-export function useUsers() {
+export function useUsers(boardId?: string) {
   return useQuery<User[]>({
-    queryKey: ["users"],
+    queryKey: ["users", boardId],
     queryFn: async () => {
-      const res = await fetch("/api/users", {
-        method: "GET",
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao editar card");
-      return data;
+      const url = boardId ? `/api/users?boardId=${boardId}` : '/api/users';
+      const res = await fetch(url);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erro ao buscar usuários");
+      }
+      return res.json();
     },
   });
 }

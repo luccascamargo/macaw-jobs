@@ -64,7 +64,7 @@ model Card {
   priority        String
   order           Int
   columnId        String
-  column          Column   @relation("ColumnCards", fields: [columnId], references: [id])
+  column          Column   @relation("ColumnCards", fields: [columnId], references: [id], onDelete: Cascade)
   assignees       User[]   @relation("CardAssignees")
   markdownContent String?
   createdAt       DateTime @default(now())

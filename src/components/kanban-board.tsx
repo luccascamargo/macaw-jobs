@@ -42,7 +42,7 @@ interface KanbanBoardProps {
   loading: boolean;
   error: string | null;
   onAddColumn: (title: string) => Promise<void>;
-  onAddTask: (columnId: string) => Promise<void>;
+  onAddTask: (columnId: string, title: string) => Promise<void>;
   refetchBoard?: () => void | Promise<any>;
 }
 
@@ -147,27 +147,19 @@ export function KanbanBoard({
           {columns.map((column) => (
             <div key={column.id} className="flex-shrink-0">
               <KanbanColumn
+                boardId={boardId}
                 column={{ ...column, tasks: column.tasks }}
-                onAddTask={() => onAddTask(column.id)}
+                onAddTask={(title) => onAddTask(column.id, title)}
               />
             </div>
           ))}
-          <button
-            className="min-w-[200px] h-[56px] bg-gray-200 rounded flex items-center justify-center text-gray-600 hover:bg-gray-300 transition"
-            onClick={async () => {
-              const title = prompt("Nome da nova coluna:");
-              if (title) await onAddColumn(title);
-            }}
-          >
-            + Nova coluna
-          </button>
         </SortableContext>
       </div>
 
       <DragOverlay>
         {activeTask ? (
           <div className="rotate-5">
-            <KanbanCard task={activeTask} />
+            <KanbanCard task={activeTask} boardId={boardId} />
           </div>
         ) : null}
       </DragOverlay>

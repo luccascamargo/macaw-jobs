@@ -54,8 +54,15 @@ export async function GET(
         },
       },
       users: {
-        where: { userId },
-        select: { userId: true },
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
       },
     },
   });
@@ -66,11 +73,13 @@ export async function GET(
       { status: 404 }
     );
   }
-  if (!board.users.length) {
+
+  const isUserMember = board.users.some(boardUser => boardUser.user.id === userId);
+  if (!isUserMember) {
     return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
   }
 
-  // Remove info de users do retorno
-  const { users, ...boardData } = board;
-  return NextResponse.json(boardData);
+  const boardUsers = board.users.map(boardUser => boardUser.user);
+
+  return NextResponse.json({ ...board, users: boardUsers });
 }
