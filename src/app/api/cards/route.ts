@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
 
   const { title, columnId, priority, order } = await req.json();
   if (!title || !columnId) {
-    return NextResponse.json({ error: "Título e coluna obrigatórios." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Título e coluna obrigatórios." },
+      { status: 400 }
+    );
   }
 
   const card = await prisma.card.create({
@@ -28,7 +31,6 @@ export async function POST(req: NextRequest) {
       columnId,
       priority: priority || "medium",
       order: order ?? 0,
-      assigneeId: null,
     },
     select: {
       id: true,
@@ -36,11 +38,10 @@ export async function POST(req: NextRequest) {
       description: true,
       priority: true,
       order: true,
-      assigneeId: true,
       createdAt: true,
       updatedAt: true,
     },
   });
 
   return NextResponse.json(card, { status: 201 });
-} 
+}

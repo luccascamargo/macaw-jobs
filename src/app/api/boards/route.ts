@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -41,7 +41,10 @@ export async function POST(req: NextRequest) {
   const { title, userId } = await req.json();
 
   if (!title || !userId) {
-    return NextResponse.json({ error: "Título e usuário obrigatórios" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Título e usuário obrigatórios" },
+      { status: 400 }
+    );
   }
 
   const board = await prisma.board.create({

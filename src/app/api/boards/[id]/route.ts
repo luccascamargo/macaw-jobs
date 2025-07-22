@@ -1,10 +1,13 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
-export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const params = await context.params;
   const token = req.cookies.get("token")?.value;
   if (!token) {
@@ -33,11 +36,17 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
             orderBy: { order: "asc" },
             select: {
               id: true,
+              assignees: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
               title: true,
               description: true,
               priority: true,
               order: true,
-              assigneeId: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -52,7 +61,10 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
   });
 
   if (!board) {
-    return NextResponse.json({ error: "Board não encontrado." }, { status: 404 });
+    return NextResponse.json(
+      { error: "Board não encontrado." },
+      { status: 404 }
+    );
   }
   if (!board.users.length) {
     return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
@@ -61,4 +73,4 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
   // Remove info de users do retorno
   const { users, ...boardData } = board;
   return NextResponse.json(boardData);
-} 
+}

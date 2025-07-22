@@ -9,6 +9,8 @@ import { GripVertical } from "lucide-react";
 import type { Task } from "./kanban-board";
 import { KanbanCardModal } from "./kanban-card-modal";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { User } from "@/hooks/useUsers";
 
 interface KanbanCardProps {
   task: Task;
@@ -51,6 +53,33 @@ export function KanbanCard({ task }: KanbanCardProps) {
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  const { mutate: updateCard } = useMutation({
+    mutationFn: async ({
+      markdownContent,
+      assignees,
+    }: {
+      markdownContent: string;
+      assignees: User[];
+    }) => {
+      const res = await fetch(`/api/cards/${task.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          ...task,
+          markdownContent,
+          assignees,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro ao editar card");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["board", task.columnId] });
+    },
+  });
+
   return (
     <>
       <Card
@@ -86,13 +115,18 @@ export function KanbanCard({ task }: KanbanCardProps) {
             >
               {task.priority}
             </Badge>
-            {task.assignee && (
-              <Avatar className="h-6 w-6">
-                <AvatarFallback className="text-xs">
-                  {getInitials(task.assignee)}
-                </AvatarFallback>
-              </Avatar>
-            )}
+            <div className="flex -space-x-2">
+              {task.assignees?.map((assignee) => (
+                <Avatar
+                  key={assignee.id}
+                  className="h-6 w-6 border-2 border-white"
+                >
+                  <AvatarFallback className="text-xs">
+                    {getInitials(assignee.name)}
+                  </AvatarFallback>
+                </Avatar>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -100,9 +134,9 @@ export function KanbanCard({ task }: KanbanCardProps) {
         open={modalOpen}
         onOpenChange={setModalOpen}
         initialValue={task.markdownContent || ""}
-        onSave={(value) => {
-          // Aqui você pode chamar a API para salvar o markdown
-          console.log("Salvar markdown:", value);
+        assignees={task.assignees}
+        onSave={(value, assignees) => {
+          updateCard({ markdownContent: value, assignees });
         }}
       />
     </>

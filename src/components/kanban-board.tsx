@@ -14,17 +14,19 @@ import {
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./kanban-column";
 import { KanbanCard } from "./kanban-card";
+import { User } from "@/hooks/useUsers";
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
   priority: string;
-  assignee?: string;
+  assignees?: User[];
   order: number;
   createdAt: string;
   updatedAt: string;
   markdownContent?: string; // campo opcional para markdown
+  columnId: string;
 }
 
 export interface Column {

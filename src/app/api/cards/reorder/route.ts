@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -19,13 +19,19 @@ export async function POST(req: NextRequest) {
 
   const { cardId, toColumnId, toOrder } = await req.json();
   if (!cardId || !toColumnId || typeof toOrder !== "number") {
-    return NextResponse.json({ error: "Parâmetros obrigatórios ausentes." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Parâmetros obrigatórios ausentes." },
+      { status: 400 }
+    );
   }
 
   // Busca o card atual
   const card = await prisma.card.findUnique({ where: { id: cardId } });
   if (!card) {
-    return NextResponse.json({ error: "Card não encontrado." }, { status: 404 });
+    return NextResponse.json(
+      { error: "Card não encontrado." },
+      { status: 404 }
+    );
   }
 
   // Remove o card da coluna de origem (ajusta ordem dos outros)
@@ -60,4 +66,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json(updated);
-} 
+}

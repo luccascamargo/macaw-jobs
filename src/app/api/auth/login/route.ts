@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -10,20 +10,31 @@ export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
-    return NextResponse.json({ error: "E-mail e senha são obrigatórios." }, { status: 400 });
+    return NextResponse.json(
+      { error: "E-mail e senha são obrigatórios." },
+      { status: 400 }
+    );
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return NextResponse.json({ error: "Usuário ou senha inválidos." }, { status: 401 });
+    return NextResponse.json(
+      { error: "Usuário ou senha inválidos." },
+      { status: 401 }
+    );
   }
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
-    return NextResponse.json({ error: "Usuário ou senha inválidos." }, { status: 401 });
+    return NextResponse.json(
+      { error: "Usuário ou senha inválidos." },
+      { status: 401 }
+    );
   }
 
-  const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
 
   const response = NextResponse.json({
     id: user.id,
@@ -41,4 +52,4 @@ export async function POST(req: NextRequest) {
   });
 
   return response;
-} 
+}
