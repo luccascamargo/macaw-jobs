@@ -1,6 +1,31 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
+  const card = await prisma.card.findUnique({
+    where: { id },
+    include: {
+      assignees: true,
+      comments: {
+        include: {
+          author: true,
+          mentions: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(card);
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,6 +56,15 @@ export async function PUT(
     },
     include: {
       assignees: true,
+      comments: {
+        include: {
+          author: true,
+          mentions: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
     },
   });
 

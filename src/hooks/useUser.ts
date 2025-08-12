@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export interface User {
   id: string;
@@ -8,27 +8,26 @@ export interface User {
 }
 
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: user,
+    error,
+    isLoading: loading,
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok)
+        throw new Error((await res.json()).error || "Erro ao buscar usuário");
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutos para usuário
+    gcTime: 1000 * 60 * 60, // 1 hora
+    retry: false, // Não tenta novamente se falhar (usuário não logado)
+  });
 
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/auth/me")
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json()).error || "Erro ao buscar usuário");
-        return res.json();
-      })
-      .then((data) => {
-        setUser(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setUser(null);
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { user, loading, error };
-} 
+  return {
+    user: user || null,
+    loading,
+    error: error?.message || null,
+  };
+}

@@ -8,42 +8,47 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  name          String
-  email         String         @unique
-  password      String
-  role          Role           @default(USER)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  refreshTokens RefreshToken[]
-  assignedCards Card[]         @relation("CardAssignees")
-  boards        BoardUser[]
+  id               String         @id @default(uuid())
+  name             String
+  email            String         @unique
+  password         String
+  role             Role           @default(USER)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  avatar           String
+  username         String         @unique
+  lastname         String
+  boards           BoardUser[]
+  authoredComments Comment[]      @relation("CommentAuthors")
+  refreshTokens    RefreshToken[]
+  assignedCards    Card[]         @relation("CardAssignees")
+  mentionedIn      Comment[]      @relation("CommentMentions")
 }
 
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Board {
   id        String      @id @default(uuid())
   title     String
-  columns   Column[]
-  users     BoardUser[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  users     BoardUser[]
+  columns   Column[]
 }
 
 model BoardUser {
   boardId String
   userId  String
-  board   Board     @relation(fields: [boardId], references: [id])
-  user    User      @relation(fields: [userId], references: [id])
   role    BoardRole
+  board   Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([boardId, userId])
 }
@@ -53,22 +58,35 @@ model Column {
   title   String
   order   Int
   boardId String
-  board   Board  @relation(fields: [boardId], references: [id])
   cards   Card[] @relation("ColumnCards")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Card {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   title           String
   description     String?
   priority        String
   order           Int
   columnId        String
-  column          Column   @relation("ColumnCards", fields: [columnId], references: [id], onDelete: Cascade)
-  assignees       User[]   @relation("CardAssignees")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   markdownContent String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  column          Column    @relation("ColumnCards", fields: [columnId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+  assignees       User[]    @relation("CardAssignees")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  cardId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation("CommentAuthors", fields: [authorId], references: [id], onDelete: Cascade)
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  mentions  User[]   @relation("CommentMentions")
 }
 
 enum Role {

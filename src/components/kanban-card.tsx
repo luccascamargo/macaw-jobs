@@ -5,7 +5,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { GripVertical } from "lucide-react";
 import type { Task } from "./kanban-board";
 import { KanbanCardModal } from "./kanban-card-modal";
 import { useState } from "react";
@@ -58,9 +57,11 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
 
   const { mutate: updateCard } = useMutation({
     mutationFn: async ({
+      title,
       markdownContent,
       assignees,
     }: {
+      title: string;
       markdownContent: string;
       assignees: User[];
     }) => {
@@ -68,6 +69,7 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
         method: "PUT",
         body: JSON.stringify({
           ...task,
+          title,
           markdownContent,
           assignees,
         }),
@@ -96,9 +98,6 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
-            <div className="cursor-grab active:cursor-grabbing p-1">
-              <GripVertical className="h-4 w-4 text-gray-400" />
-            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
@@ -116,7 +115,7 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
             >
               {task.priority}
             </Badge>
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-1">
               {task.assignees?.map((assignee) => (
                 <Avatar
                   key={assignee.id}
@@ -134,10 +133,12 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
       <KanbanCardModal
         open={modalOpen}
         onOpenChange={setModalOpen}
+        cardId={task.id}
+        initialTitle={task.title}
         initialValue={task.markdownContent || ""}
         assignees={task.assignees}
-        onSave={(value, assignees) => {
-          updateCard({ markdownContent: value, assignees });
+        onSave={(title, description, assignees) => {
+          updateCard({ title, markdownContent: description, assignees });
         }}
       />
     </>

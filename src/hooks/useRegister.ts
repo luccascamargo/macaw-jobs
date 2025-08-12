@@ -5,14 +5,19 @@ export function useRegister() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function register(name: string, email: string, password: string): Promise<User | null> {
+  async function register(
+    name: string,
+    email: string,
+    password: string,
+    lastname: string
+  ): Promise<User | null> {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, lastname }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erro ao cadastrar");
@@ -26,4 +31,4 @@ export function useRegister() {
   }
 
   return { register, loading, error };
-} 
+}

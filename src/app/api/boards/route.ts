@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   if (!token) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
+
   let userId = null;
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
@@ -38,13 +39,23 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { title, userId } = await req.json();
+  const token = req.cookies.get("token")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  }
 
-  if (!title || !userId) {
-    return NextResponse.json(
-      { error: "Título e usuário obrigatórios" },
-      { status: 400 }
-    );
+  let userId = null;
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
+    userId = payload.sub;
+  } catch {
+    return NextResponse.json({ error: "Token inválido." }, { status: 401 });
+  }
+
+  const { title } = await req.json();
+
+  if (!title) {
+    return NextResponse.json({ error: "Título obrigatório" }, { status: 400 });
   }
 
   const board = await prisma.board.create({
@@ -56,6 +67,12 @@ export async function POST(req: NextRequest) {
           role: "OWNER",
         },
       },
+    },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 

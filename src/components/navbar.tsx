@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useUsers, User } from "@/hooks/useUsers";
 import {
   Select,
@@ -10,6 +9,7 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useLogout } from "@/hooks/useLogout";
 
 interface NavbarProps {
   boardId: string;
@@ -26,7 +26,7 @@ export function Navbar({
 }: NavbarProps) {
   const { data: users } = useUsers(boardId);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const router = useRouter();
+  const { logout, loading: logoutLoading } = useLogout();
 
   const getInitials = (name: string) => {
     return name
@@ -41,11 +41,6 @@ export function Navbar({
       onInviteUser(selectedUser);
       setSelectedUser(null); // Reset selection after inviting
     }
-  };
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/auth/login");
   };
 
   return (
@@ -79,8 +74,12 @@ export function Navbar({
           </>
         )}
         <Button onClick={onAddColumn}>+ Nova Coluna</Button>
-        <Button variant="outline" onClick={handleLogout}>
-          Sair
+        <Button
+          variant="outline"
+          onClick={() => logout()}
+          disabled={logoutLoading}
+        >
+          {logoutLoading ? "Saindo..." : "Sair"}
         </Button>
       </div>
     </nav>

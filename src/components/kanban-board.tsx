@@ -157,11 +157,7 @@ export function KanbanBoard({
       </div>
 
       <DragOverlay>
-        {activeTask ? (
-          <div className="rotate-5">
-            <KanbanCard task={activeTask} boardId={boardId} />
-          </div>
-        ) : null}
+        {activeTask ? <KanbanCard task={activeTask} boardId={boardId} /> : null}
       </DragOverlay>
     </DndContext>
   );

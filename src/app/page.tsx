@@ -1,22 +1,43 @@
-'use client'
+"use client";
 import Link from "next/link";
 import { useBoards } from "@/hooks/useBoards";
 import { CreateBoardModal } from "@/components/create-board-modal";
-import { useState } from "react";
+import { useUserContext } from "@/context/user-context";
 
 export default function Home() {
   const { boards, loading, error } = useBoards();
-  const [refresh, setRefresh] = useState(0);
+  const { user, loading: userLoading } = useUserContext();
 
-  // Função para atualizar a lista de boards após criar
-  function handleCreated() {
-    setRefresh((r) => r + 1);
+  // Se ainda está carregando o usuário, mostra loading
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
+        <div className="text-lg">Carregando...</div>
+      </div>
+    );
   }
 
-  // Refetch boards quando refresh mudar
-  // (Simples: pode ser melhorado com SWR ou React Query)
-  // Aqui, só para forçar o hook a rodar de novo
-  // (ou pode passar refresh como key para useBoards)
+  // Se não há usuário logado, mostra mensagem de login
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Bem-vindo ao Macaw Jobs
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Faça login para começar a usar seus boards
+          </p>
+          <Link
+            href="/auth/login"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+          >
+            Fazer Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -28,7 +49,7 @@ export default function Home() {
               Clique em um board para visualizar o kanban
             </p>
           </div>
-          <CreateBoardModal onCreated={handleCreated} />
+          <CreateBoardModal />
         </div>
         {loading && <div>Carregando...</div>}
         {error && <div className="text-red-500">{error}</div>}
@@ -50,4 +71,3 @@ export default function Home() {
     </div>
   );
 }
-

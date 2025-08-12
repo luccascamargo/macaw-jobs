@@ -1,5 +1,12 @@
-'use client'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+"use client";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -11,8 +18,11 @@ import { useState } from "react";
 
 const schema = z.object({
   name: z.string().min(2, { message: "Nome obrigatório" }),
+  lastname: z.string().min(3),
   email: z.email({ message: "E-mail inválido" }),
-  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  password: z
+    .string()
+    .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -23,12 +33,17 @@ export default function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "", lastname: "" },
   });
 
   async function onSubmit(values: FormValues) {
     setFormError(null);
-    const user = await register(values.name, values.email, values.password);
+    const user = await register(
+      values.name,
+      values.email,
+      values.password,
+      values.lastname
+    );
     if (user) {
       router.push("/auth/login");
     } else if (error) {
@@ -56,6 +71,19 @@ export default function RegisterPage() {
           />
           <FormField
             control={form.control}
+            name="lastname"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome</FormLabel>
+                <FormControl>
+                  <Input placeholder="Seu sobrenome" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
@@ -74,7 +102,11 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Crie uma senha" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Crie uma senha"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -88,4 +120,4 @@ export default function RegisterPage() {
       </Form>
     </div>
   );
-} 
+}

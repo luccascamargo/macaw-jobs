@@ -4,13 +4,16 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  lastname: string;
+  username: string;
+  avatar: string;
 }
 
 export function useUsers(boardId?: string) {
   return useQuery<User[]>({
     queryKey: ["users", boardId],
     queryFn: async () => {
-      const url = boardId ? `/api/users?boardId=${boardId}` : '/api/users';
+      const url = boardId ? `/api/users?boardId=${boardId}` : "/api/users";
       const res = await fetch(url);
       if (!res.ok) {
         const errorData = await res.json();
