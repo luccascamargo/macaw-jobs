@@ -66,7 +66,7 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         style={style}
-        className="w-80 bg-gray-100 rounded-lg p-4 h-fit max-h-[80vh] flex flex-col"
+        className="w-80 bg-gray-100 rounded-lg p-4 min-h-40 flex flex-col"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

@@ -66,3 +66,56 @@ export async function sendMentionEmail(data: MentionEmailData) {
     // Não vamos falhar a criação do comentário por causa de erro no email
   }
 }
+
+interface AssigneeEmailData {
+  assignedUser: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  cardTitle: string;
+  boardTitle: string;
+  boardId: string;
+  assignedBy: {
+    name: string;
+  };
+}
+
+export async function sendAssigneeEmail(data: AssigneeEmailData) {
+  try {
+    const { assignedUser, cardTitle, boardTitle, boardId, assignedBy } = data;
+
+    await resend.emails.send({
+      from: "Acme <onboarding@resend.dev>",
+      to: assignedUser.email,
+      subject: `Você foi atribuído a um card por ${assignedBy.name}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">Você foi atribuído a um novo card!</h2>
+          
+          <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>${assignedBy.name}</strong> atribuiu a você o card:</p>
+            <h3 style="color: #1e293b; margin: 10px 0;">${cardTitle}</h3>
+            <p style="color: #64748b; font-size: 14px;">No board: ${boardTitle}</p>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/board/${boardId}" 
+               style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Ver o card
+            </a>
+          </div>
+          
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+          <p style="color: #64748b; font-size: 12px; text-align: center;">
+            Este email foi enviado automaticamente pelo Macaw Jobs.
+          </p>
+        </div>
+      `,
+    });
+
+    console.log(`Email de atribuição enviado para ${assignedUser.email}`);
+  } catch (error) {
+    console.error("Erro ao enviar email de atribuição:", error);
+  }
+}

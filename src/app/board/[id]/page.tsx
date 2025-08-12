@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InputDialog } from "@/components/ui/input-dialog";
-import { User, useUsers } from "@/hooks/useUsers";
 
 export default function BoardPage() {
   const params = useParams();

@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useUserContext } from "@/context/user-context";
 import type { Task, Column } from "./kanban-board";
 import { KanbanCardModal } from "./kanban-card-modal";
 import { useState } from "react";
@@ -75,7 +76,7 @@ export function KanbanCard({ task, boardId, columns }: KanbanCardProps) {
   const priorityInfo = getPriorityInfo(task.priority);
 
   const [modalOpen, setModalOpen] = useState(false);
-
+  const { user } = useUserContext();
   const queryClient = useQueryClient();
 
   const { mutate: updateCard } = useMutation({
@@ -92,8 +93,13 @@ export function KanbanCard({ task, boardId, columns }: KanbanCardProps) {
       priority: string;
       columnId: string;
     }) => {
+      if (!user) throw new Error("User not authenticated");
       const res = await fetch(`/api/cards/${task.id}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.id,
+        },
         body: JSON.stringify({
           ...task,
           title,

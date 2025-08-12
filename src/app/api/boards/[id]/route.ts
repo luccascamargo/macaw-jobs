@@ -81,7 +81,10 @@ export async function GET(
     (boardUser) => boardUser.user.id === userId
   );
   if (!isUserMember) {
-    return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
+    return NextResponse.json(
+      { error: "Acesso negado. Você não faz parte desse board" },
+      { status: 403 }
+    );
   }
 
   const boardUsers = board.users.map((boardUser) => boardUser.user);
