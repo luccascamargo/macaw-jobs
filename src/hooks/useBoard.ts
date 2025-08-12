@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { User } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
 
 export interface Card {
   id: string;
@@ -27,15 +28,21 @@ export interface BoardDetail {
 
 export function useBoard(boardId: string | undefined) {
   const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ['board', boardId],
+    queryKey: ["board", boardId],
     queryFn: async () => {
       if (!boardId) return null;
       const res = await fetch(`/api/boards/${boardId}`);
-      if (!res.ok) throw new Error((await res.json()).error || 'Erro ao buscar board');
+      if (!res.ok)
+        throw new Error((await res.json()).error || "Erro ao buscar board");
       return res.json();
     },
     enabled: !!boardId,
   });
 
-  return { board: data, loading: isLoading, error: error?.message || null, refetch };
-} 
+  return {
+    board: data,
+    loading: isLoading,
+    error: error?.message || null,
+    refetch,
+  };
+}

@@ -45,6 +45,7 @@ export async function GET(
               },
               title: true,
               description: true,
+              markdownContent: true,
               priority: true,
               order: true,
               createdAt: true,
@@ -74,12 +75,14 @@ export async function GET(
     );
   }
 
-  const isUserMember = board.users.some(boardUser => boardUser.user.id === userId);
+  const isUserMember = board.users.some(
+    (boardUser) => boardUser.user.id === userId
+  );
   if (!isUserMember) {
     return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
   }
 
-  const boardUsers = board.users.map(boardUser => boardUser.user);
+  const boardUsers = board.users.map((boardUser) => boardUser.user);
 
   return NextResponse.json({ ...board, users: boardUsers });
 }

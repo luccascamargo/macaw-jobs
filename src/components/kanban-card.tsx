@@ -17,6 +17,7 @@ interface KanbanCardProps {
 }
 
 export function KanbanCard({ task, boardId }: KanbanCardProps) {
+  console.log(task);
   const {
     attributes,
     listeners,

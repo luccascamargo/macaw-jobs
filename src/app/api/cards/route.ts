@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       id: true,
       title: true,
       description: true,
+      markdownContent: true,
       priority: true,
       order: true,
       createdAt: true,
