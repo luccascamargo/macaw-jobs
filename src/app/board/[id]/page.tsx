@@ -29,7 +29,8 @@ export default function BoardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, role: "MEMBER" }), // Default to MEMBER role
       });
-      if (!res.ok) throw new Error((await res.json()).error || "Erro ao convidar usuário");
+      if (!res.ok)
+        throw new Error((await res.json()).error || "Erro ao convidar usuário");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
@@ -121,7 +122,7 @@ export default function BoardPage() {
         onInviteUser={handleInviteUser}
         boardUsers={board?.users || []}
       />
-      <div className="p-4">
+      <div className="pt-4 px-4">
         <KanbanBoard
           boardId={boardId}
           columns={columns}

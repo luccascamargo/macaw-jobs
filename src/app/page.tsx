@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useBoards } from "@/hooks/useBoards";
+import { useBoards, Board } from "@/hooks/useBoards";
 import { CreateBoardModal } from "@/components/create-board-modal";
 import { useUserContext } from "@/context/user-context";
 
@@ -40,7 +40,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 pt-4 px-4">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -54,7 +54,7 @@ export default function Home() {
         {loading && <div>Carregando...</div>}
         {error && <div className="text-red-500">{error}</div>}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {boards.map((board) => (
+          {boards.map((board: Board) => (
             <Link
               key={board.id}
               href={`/board/${board.id}`}

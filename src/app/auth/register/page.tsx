@@ -52,72 +52,80 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-20 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-6 text-center">Criar conta</h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome</FormLabel>
-                <FormControl>
-                  <Input placeholder="Seu nome" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16">
+      <div className="max-w-sm mx-auto p-6 bg-white rounded shadow">
+        <h1 className="text-2xl font-bold mb-6 text-center">Criar conta</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu nome" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu sobrenome" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="seu@email.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Crie uma senha"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {formError && (
+              <div className="text-red-500 text-sm">{formError}</div>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="lastname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome</FormLabel>
-                <FormControl>
-                  <Input placeholder="Seu sobrenome" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>E-mail</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="seu@email.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Senha</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Crie uma senha"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {formError && <div className="text-red-500 text-sm">{formError}</div>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Criando..." : "Criar conta"}
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Criando..." : "Criar conta"}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

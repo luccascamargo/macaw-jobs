@@ -43,54 +43,60 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="max-w-sm mx-auto">
-      <CardHeader>
-        <CardTitle>Entrar</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="seu@email.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Senha</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="Sua senha" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {error && <div className="text-red-500 text-sm">{error}</div>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-      <CardFooter>
-        <span>Não possui uma conta? </span>
-        <Link href={"/auth/register"}>Registrar</Link>
-      </CardFooter>
-    </Card>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16">
+      <Card className="max-w-sm mx-auto">
+        <CardHeader>
+          <CardTitle>Entrar</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>E-mail</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="seu@email.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Sua senha"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error && <div className="text-red-500 text-sm">{error}</div>}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter>
+          <span>Não possui uma conta? </span>
+          <Link href={"/auth/register"}>Registrar</Link>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

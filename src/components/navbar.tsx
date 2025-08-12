@@ -26,7 +26,6 @@ export function Navbar({
 }: NavbarProps) {
   const { data: users } = useUsers(boardId);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const { logout, loading: logoutLoading } = useLogout();
 
   const getInitials = (name: string) => {
     return name
@@ -44,13 +43,14 @@ export function Navbar({
   };
 
   return (
-    <nav className="bg-gray-100 p-4 flex justify-between items-center">
-      <h1 className="text-xl font-bold">Macaw Jobs</h1>
+    <nav className="p-4 flex justify-end items-center">
       <div className="flex items-center gap-2">
         <div className="flex -space-x-2 overflow-hidden">
           {boardUsers.map((user) => (
-            <Avatar key={user.id} className="h-8 w-8 border-2 border-white">
-              <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+            <Avatar key={user.id} className="h-8 w-8 border-2 border-primary">
+              <AvatarFallback>
+                {`${getInitials(user.name)}${getInitials(user.lastname)}`}
+              </AvatarFallback>
             </Avatar>
           ))}
         </div>
@@ -74,13 +74,6 @@ export function Navbar({
           </>
         )}
         <Button onClick={onAddColumn}>+ Nova Coluna</Button>
-        <Button
-          variant="outline"
-          onClick={() => logout()}
-          disabled={logoutLoading}
-        >
-          {logoutLoading ? "Saindo..." : "Sair"}
-        </Button>
       </div>
     </nav>
   );

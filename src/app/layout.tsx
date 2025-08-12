@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { UserProvider } from "@/context/user-context";
 import { ReactQueryProvider } from "@/context/react-query-provider";
+import { GlobalNavbar } from "@/components/global-navbar";
 import "@mdxeditor/editor/style.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,10 @@ export default function RootLayout({
     <html lang="pt-br">
       <body>
         <ReactQueryProvider>
-          <UserProvider>{children}</UserProvider>
+          <UserProvider>
+            <GlobalNavbar />
+            {children}
+          </UserProvider>
         </ReactQueryProvider>
       </body>
     </html>
