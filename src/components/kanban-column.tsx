@@ -18,12 +18,14 @@ import { InputDialog } from "./ui/input-dialog";
 interface KanbanColumnProps {
   boardId: string;
   column: Column;
+  columns: Column[];
   onAddTask: (title: string) => void;
 }
 
 export function KanbanColumn({
   boardId,
   column,
+  columns,
   onAddTask,
 }: KanbanColumnProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -99,7 +101,12 @@ export function KanbanColumn({
         >
           <div className="space-y-3 min-h-[200px] max-h-[calc(80vh-120px)] overflow-y-auto pr-2">
             {column.tasks.map((task) => (
-              <KanbanCard key={task.id} task={task} boardId={boardId} />
+              <KanbanCard
+                key={task.id}
+                task={task}
+                boardId={boardId}
+                columns={columns}
+              />
             ))}
           </div>
         </SortableContext>

@@ -36,6 +36,7 @@ export async function GET(
             orderBy: { order: "asc" },
             select: {
               id: true,
+              columnId: true,
               assignees: {
                 select: {
                   id: true,

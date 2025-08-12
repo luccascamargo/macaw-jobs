@@ -13,15 +13,26 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { useComments } from "@/hooks/useComments";
 import { useCreateComment } from "@/hooks/useCreateComment";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User as UserIcon, Text, MessageSquare, Type } from "lucide-react";
-import { Textarea } from "./ui/textarea";
+import {
+  User as UserIcon,
+  Text,
+  MessageSquare,
+  Flag,
+  Move,
+} from "lucide-react";
 import { Input } from "./ui/input";
 import { CommentInput } from "./comment-input";
+import { Badge } from "./ui/badge";
+
+interface Column {
+  id: string;
+  title: string;
+  order: number;
+}
 
 interface KanbanCardModalProps {
   open: boolean;
@@ -29,7 +40,16 @@ interface KanbanCardModalProps {
   cardId: string;
   initialTitle?: string;
   initialValue?: string;
-  onSave: (title: string, description: string, assignees: User[]) => void;
+  initialPriority?: string;
+  initialColumnId?: string;
+  columns?: Column[];
+  onSave: (
+    title: string,
+    description: string,
+    assignees: User[],
+    priority: string,
+    columnId: string
+  ) => void;
   assignees?: User[];
 }
 
@@ -41,33 +61,83 @@ const getInitials = (name: string) => {
     .toUpperCase();
 };
 
+const priorityOptions = [
+  { value: "low", label: "Baixa", color: "bg-green-100 text-green-800" },
+  { value: "medium", label: "Média", color: "bg-yellow-100 text-yellow-800" },
+  { value: "high", label: "Alta", color: "bg-red-100 text-red-800" },
+];
+
 export function KanbanCardModal({
   open,
   onOpenChange,
   cardId,
   initialTitle = "",
   initialValue = "",
+  initialPriority = "medium",
+  initialColumnId = "",
+  columns = [],
   onSave,
   assignees = [],
 }: KanbanCardModalProps) {
   const [title, setTitle] = useState(initialTitle);
   const [value, setValue] = useState(initialValue);
+  const [priority, setPriority] = useState(initialPriority);
+  const [columnId, setColumnId] = useState(initialColumnId);
   const { data: users } = useUsers();
   const [selectedUsers, setSelectedUsers] = useState<User[]>(assignees);
   const { data: comments, refetch: refetchComments } = useComments(cardId);
   const { mutate: createComment } = useCreateComment();
   const [comment, setComment] = useState("");
 
+  // Garantir que a prioridade seja sempre uma das opções válidas
+  const getValidPriority = (priority: string) => {
+    const normalizedPriority = priority?.toLowerCase() || "medium";
+    return (
+      priorityOptions.find((p) => p.value === normalizedPriority)?.value ||
+      "medium"
+    );
+  };
+
+  // Garantir que a coluna seja sempre uma das opções válidas
+  const getValidColumnId = (columnId: string) => {
+    if (!columnId || !columns.length) return columns[0]?.id || "";
+    const foundColumn = columns.find((c) => c.id === columnId);
+    return foundColumn?.id || columns[0]?.id || "";
+  };
+
   useEffect(() => {
     if (open) {
       setTitle(initialTitle);
       setValue(initialValue);
+      setPriority(getValidPriority(initialPriority));
+      const validColumn = getValidColumnId(initialColumnId);
+      setColumnId(validColumn);
       setSelectedUsers(assignees);
     }
-  }, [open, initialTitle, initialValue, assignees]);
+  }, [
+    open,
+    initialTitle,
+    initialValue,
+    initialPriority,
+    initialColumnId,
+    assignees,
+    columns,
+  ]);
+
+  // Atualizar a coluna se ela não for válida
+  useEffect(() => {
+    if (columns.length > 0) {
+      const validColumnId = getValidColumnId(columnId);
+      if (validColumnId !== columnId) {
+        setColumnId(validColumnId);
+      }
+    }
+  }, [columns, columnId]);
 
   const handleSave = () => {
-    onSave(title, value, selectedUsers);
+    // Garantir que a coluna seja válida antes de salvar
+    const finalColumnId = getValidColumnId(columnId);
+    onSave(title, value, selectedUsers, priority, finalColumnId);
     onOpenChange(false);
   };
 
@@ -92,6 +162,12 @@ export function KanbanCardModal({
       }
     );
   };
+
+  const currentPriority = priorityOptions.find((p) => p.value === priority);
+
+  // Garantir que sempre haja uma coluna válida selecionada
+  const validColumnId = getValidColumnId(columnId);
+  const displayColumn = columns.find((c) => c.id === validColumnId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,7 +237,98 @@ export function KanbanCardModal({
           {/* Coluna Lateral */}
           <div className="md:col-span-1 space-y-4">
             <div>
-              <h3 className="text-sm font-medium  text-gray-500">
+              <h3 className="text-sm font-medium text-gray-500">
+                Propriedades
+              </h3>
+
+              {/* Seletor de Coluna */}
+              <div className="mt-2">
+                <label className="text-xs font-medium text-gray-600 mb-1 block">
+                  Coluna
+                </label>
+                <Select value={columnId} onValueChange={setColumnId}>
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center gap-2">
+                      <Move size={16} />
+                      <span>Mover para</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {columns.map((column) => (
+                      <SelectItem key={column.id} value={column.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{column.title}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {displayColumn ? (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      Coluna atual: {displayColumn.title}
+                    </Badge>
+                  </div>
+                ) : columnId ? (
+                  <div className="mt-2">
+                    <Badge
+                      variant="outline"
+                      className="text-xs text-yellow-600"
+                    >
+                      Coluna não encontrada
+                    </Badge>
+                  </div>
+                ) : (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-xs text-gray-500">
+                      Nenhuma coluna selecionada
+                    </Badge>
+                  </div>
+                )}
+              </div>
+
+              {/* Seletor de Prioridade */}
+              <div className="mt-2">
+                <label className="text-xs font-medium text-gray-600 mb-1 block">
+                  Prioridade
+                </label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center gap-2">
+                      <Flag size={16} />
+                      <span>Prioridade</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {priorityOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs ${option.color}`}
+                          >
+                            {option.label}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {currentPriority && (
+                  <div className="mt-2">
+                    <Badge
+                      variant="secondary"
+                      className={`text-xs ${currentPriority.color}`}
+                    >
+                      Prioridade atual: {currentPriority.label}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">
                 Adicionar ao card
               </h3>
               <Select

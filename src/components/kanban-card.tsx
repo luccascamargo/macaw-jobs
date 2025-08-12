@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import type { Task } from "./kanban-board";
+import type { Task, Column } from "./kanban-board";
 import { KanbanCardModal } from "./kanban-card-modal";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,10 +14,10 @@ import { User } from "@/hooks/useUsers";
 interface KanbanCardProps {
   task: Task;
   boardId: string;
+  columns: Column[];
 }
 
-export function KanbanCard({ task, boardId }: KanbanCardProps) {
-  console.log(task);
+export function KanbanCard({ task, boardId, columns }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -44,6 +44,12 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
     high: "bg-red-100 text-red-800",
   };
 
+  const priorityLabels = {
+    low: "Baixa",
+    medium: "Média",
+    high: "Alta",
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -51,6 +57,22 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
       .join("")
       .toUpperCase();
   };
+
+  // Garantir que a prioridade seja sempre uma das opções válidas
+  const getPriorityInfo = (priority: string) => {
+    const normalizedPriority = priority?.toLowerCase() || "medium";
+    const validPriority = ["low", "medium", "high"].includes(normalizedPriority)
+      ? normalizedPriority
+      : "medium";
+
+    return {
+      value: validPriority,
+      color: priorityColors[validPriority as keyof typeof priorityColors],
+      label: priorityLabels[validPriority as keyof typeof priorityLabels],
+    };
+  };
+
+  const priorityInfo = getPriorityInfo(task.priority);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -61,10 +83,14 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
       title,
       markdownContent,
       assignees,
+      priority,
+      columnId,
     }: {
       title: string;
       markdownContent: string;
       assignees: User[];
+      priority: string;
+      columnId: string;
     }) => {
       const res = await fetch(`/api/cards/${task.id}`, {
         method: "PUT",
@@ -73,6 +99,8 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
           title,
           markdownContent,
           assignees,
+          priority,
+          columnId,
         }),
       });
       const data = await res.json();
@@ -110,11 +138,9 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
           <div className="flex items-center justify-between">
             <Badge
               variant="secondary"
-              className={`text-xs ${
-                priorityColors[task.priority as keyof typeof priorityColors]
-              }`}
+              className={`text-xs ${priorityInfo.color}`}
             >
-              {task.priority}
+              {priorityInfo.label}
             </Badge>
             <div className="flex -space-x-1">
               {task.assignees?.map((assignee) => (
@@ -137,9 +163,18 @@ export function KanbanCard({ task, boardId }: KanbanCardProps) {
         cardId={task.id}
         initialTitle={task.title}
         initialValue={task.markdownContent || ""}
+        initialPriority={priorityInfo.value}
+        initialColumnId={task.columnId}
+        columns={columns}
         assignees={task.assignees}
-        onSave={(title, description, assignees) => {
-          updateCard({ title, markdownContent: description, assignees });
+        onSave={(title, description, assignees, priority, columnId) => {
+          updateCard({
+            title,
+            markdownContent: description,
+            assignees,
+            priority,
+            columnId,
+          });
         }}
       />
     </>

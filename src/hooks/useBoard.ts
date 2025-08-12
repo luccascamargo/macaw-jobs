@@ -7,6 +7,7 @@ export interface Card {
   description?: string;
   priority: string;
   order: number;
+  columnId: string;
   assigneeId?: string;
   createdAt: string;
   updatedAt: string;

@@ -149,6 +149,7 @@ export function KanbanBoard({
               <KanbanColumn
                 boardId={boardId}
                 column={{ ...column, tasks: column.tasks }}
+                columns={columns}
                 onAddTask={(title) => onAddTask(column.id, title)}
               />
             </div>
@@ -157,7 +158,9 @@ export function KanbanBoard({
       </div>
 
       <DragOverlay>
-        {activeTask ? <KanbanCard task={activeTask} boardId={boardId} /> : null}
+        {activeTask ? (
+          <KanbanCard task={activeTask} boardId={boardId} columns={columns} />
+        ) : null}
       </DragOverlay>
     </DndContext>
   );

@@ -12,7 +12,7 @@ import { Send, AtSign } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";
 import { useCreateComment } from "@/hooks/useCreateComment";
 import { useComments } from "@/hooks/useComments";
-import { User } from "./types/card";
+import type { User } from "@/hooks/useUsers";
 
 interface ICommentInput {
   cardId: string;
@@ -47,11 +47,12 @@ export function CommentInput({ cardId }: ICommentInput) {
       // Verificar se não há espaços após o "@"
       if (!textAfterAt.includes(" ") && !textAfterAt.includes("\n")) {
         const searchTerm = textAfterAt.toLowerCase();
-        const filtered = users?.filter(
-          (user) =>
-            user.name.toLowerCase().includes(searchTerm) ||
-            user.username.toLowerCase().includes(searchTerm)
-        );
+        const filtered =
+          users?.filter(
+            (user) =>
+              user.name.toLowerCase().includes(searchTerm) ||
+              user.username.toLowerCase().includes(searchTerm)
+          ) || [];
 
         setFilteredUsers(filtered);
         setMentionStart(lastAtIndex);
@@ -115,9 +116,10 @@ export function CommentInput({ cardId }: ICommentInput) {
   const handleSubmit = () => {
     if (!comment.trim()) return;
 
-    const mentions = users
-      ?.filter((u) => comment.includes(`@${u.name}`))
-      .map((u) => u.id);
+    const mentions =
+      users
+        ?.filter((u) => comment.includes(`@${u.username}`))
+        .map((u) => u.id) || [];
 
     createComment(
       {
@@ -158,11 +160,6 @@ export function CommentInput({ cardId }: ICommentInput) {
     <div className="w-full max-w-2xl mx-auto p-4">
       <div className="relative">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <AtSign className="h-4 w-4" />
-            <span>Digite @ para mencionar usuários</span>
-          </div>
-
           <div className="relative">
             <Textarea
               ref={textareaRef}
@@ -216,7 +213,7 @@ export function CommentInput({ cardId }: ICommentInput) {
                         .split(" ")
                         .map((n) => n[0])
                         .join("")
-                        .toLocaleLowerCase()}
+                        .toLowerCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
@@ -224,7 +221,7 @@ export function CommentInput({ cardId }: ICommentInput) {
                       {user.name}
                     </div>
                     <div className="text-xs text-muted-foreground truncate">
-                      @{user.username.toLocaleLowerCase()}
+                      @{user.username.toLowerCase()}
                     </div>
                   </div>
                 </div>
