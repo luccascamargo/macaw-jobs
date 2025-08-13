@@ -18,8 +18,8 @@ export function useLogout() {
       return res.json();
     },
     onSuccess: () => {
-      // Limpa todo o cache do React Query
-      queryClient.clear();
+      // Define o dado do usuário como null no cache do React Query
+      queryClient.setQueryData(["user"], null);
       // Redireciona para a página de login
       router.push("/auth/login");
     },

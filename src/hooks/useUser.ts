@@ -4,32 +4,29 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  username: string;
-  avatar: string;
   createdAt: string;
+  avatar?: string;
 }
+
+const fetchUser = async (): Promise<User | null> => {
+  const res = await fetch("/api/auth/me");
+  if (!res.ok) {
+    return null;
+  }
+  return res.json();
+};
 
 export function useUser() {
   const {
     data: user,
-    error,
     isLoading: loading,
-  } = useQuery({
+    error,
+  } = useQuery<User | null, Error>({
     queryKey: ["user"],
-    queryFn: async () => {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok)
-        throw new Error((await res.json()).error || "Erro ao buscar usuário");
-      return res.json();
-    },
-    staleTime: 1000 * 60 * 30, // 30 minutos para usuário
-    gcTime: 1000 * 60 * 60, // 1 hora
-    retry: false, // Não tenta novamente se falhar (usuário não logado)
+    queryFn: fetchUser,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
-  return {
-    user: user || null,
-    loading,
-    error: error?.message || null,
-  };
+  return { user: user || null, loading, error: error?.message || null };
 }
