@@ -12,15 +12,15 @@ export async function POST(req: NextRequest) {
   if (!email || !password) {
     return NextResponse.json(
       { error: "E-mail e senha são obrigatórios." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
+  if (!user || !user.password) {
     return NextResponse.json(
       { error: "Usuário ou senha inválidos." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   if (!valid) {
     return NextResponse.json(
       { error: "Usuário ou senha inválidos." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     createdAt: user.createdAt,
   });
 
-  response.cookies.set("token", token, {
+  response.cookies.set("accessToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

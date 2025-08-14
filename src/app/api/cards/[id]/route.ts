@@ -5,9 +5,9 @@ import { sendAssigneeEmail } from "@/lib/email-service";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   const card = await prisma.card.findUnique({
     where: { id },
@@ -30,10 +30,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const assignedById = req.headers.get("x-user-id");
 
     if (!assignedById) {
@@ -46,7 +46,7 @@ export async function PUT(
     if (!assignedByUser) {
       return NextResponse.json(
         { error: "Assigner not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -93,7 +93,7 @@ export async function PUT(
     // 3. Determine new assignees and send emails
     if (newAssignees) {
       const newlyAssignedUsers = updatedCard.assignees.filter(
-        (user) => !oldAssigneeIds.includes(user.id)
+        (user) => !oldAssigneeIds.includes(user.id),
       );
 
       // Use Promise.all to send emails in parallel
@@ -105,8 +105,8 @@ export async function PUT(
             boardId: cardBeforeUpdate.column.board.id,
             boardTitle: cardBeforeUpdate.column.board.title,
             assignedBy: assignedByUser,
-          })
-        )
+          }),
+        ),
       );
     }
 
@@ -115,7 +115,7 @@ export async function PUT(
     console.error("Error updating card:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

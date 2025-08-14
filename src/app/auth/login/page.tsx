@@ -43,12 +43,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16">
+    <div className="flex items-center justify-center pt-16">
       <Card className="max-w-sm mx-auto">
         <CardHeader>
           <CardTitle>Entrar</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -91,9 +91,17 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+            onClick={() => (window.location.href = "/api/auth/google/login")}
+          >
+            Entrar com Google
+          </Button>
         </CardContent>
-        <CardFooter>
-          <span>Não possui uma conta? </span>
+        <CardFooter className="space-x-2">
+          <span>Não possui uma conta?</span>
           <Link href={"/auth/register"}>Registrar</Link>
         </CardFooter>
       </Card>

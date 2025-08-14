@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get("accessToken")?.value;
   if (!token) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }

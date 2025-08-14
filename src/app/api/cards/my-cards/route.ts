@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get("accessToken")?.value;
   if (!token) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
@@ -23,9 +23,9 @@ export async function GET(req: NextRequest) {
       where: {
         assignees: {
           some: {
-            id: userId
-          }
-        }
+            id: userId,
+          },
+        },
       },
       include: {
         column: {
@@ -33,18 +33,18 @@ export async function GET(req: NextRequest) {
             board: {
               select: {
                 id: true,
-                title: true
-              }
-            }
-          }
+                title: true,
+              },
+            },
+          },
         },
         assignees: {
           select: {
             id: true,
             name: true,
             username: true,
-            avatar: true
-          }
+            avatar: true,
+          },
         },
         comments: {
           include: {
@@ -53,25 +53,25 @@ export async function GET(req: NextRequest) {
                 id: true,
                 name: true,
                 username: true,
-                avatar: true
-              }
-            }
+                avatar: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: "desc"
-          }
-        }
+            createdAt: "desc",
+          },
+        },
       },
       orderBy: [
         {
           column: {
-            order: "asc"
-          }
+            order: "asc",
+          },
         },
         {
-          order: "asc"
-        }
-      ]
+          order: "asc",
+        },
+      ],
     });
 
     return NextResponse.json(userCards);
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     console.error("Erro ao buscar cards do usuário:", error);
     return NextResponse.json(
       { error: "Erro interno do servidor." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

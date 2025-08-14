@@ -6,10 +6,10 @@ const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const params = await context.params;
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get("accessToken")?.value;
   if (!token) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
@@ -73,17 +73,17 @@ export async function GET(
   if (!board) {
     return NextResponse.json(
       { error: "Board não encontrado." },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
   const isUserMember = board.users.some(
-    (boardUser) => boardUser.user.id === userId
+    (boardUser) => boardUser.user.id === userId,
   );
   if (!isUserMember) {
     return NextResponse.json(
       { error: "Acesso negado. Você não faz parte desse board" },
-      { status: 403 }
+      { status: 403 },
     );
   }
 

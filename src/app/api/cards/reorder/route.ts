@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
 export async function POST(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get("accessToken")?.value;
   if (!token) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (!cardId || !toColumnId || typeof toOrder !== "number") {
     return NextResponse.json(
       { error: "Parâmetros obrigatórios ausentes." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!card) {
     return NextResponse.json(
       { error: "Card não encontrado." },
-      { status: 404 }
+      { status: 404 },
     );
   }
 

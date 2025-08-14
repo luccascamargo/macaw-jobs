@@ -1,13 +1,12 @@
-
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id: boardId } = params;
+    const { id: boardId } = await params;
     const requestingUserId = req.headers.get("x-user-id");
 
     if (!requestingUserId) {
@@ -22,19 +21,12 @@ export async function POST(
       return NextResponse.json({ error: "Board not found" }, { status: 404 });
     }
 
-    if (board.ownerId !== requestingUserId) {
-      return NextResponse.json(
-        { error: "Only the board owner can invite users." },
-        { status: 403 }
-      );
-    }
-
     const { userId, role } = await req.json();
 
     if (!userId || !role) {
       return NextResponse.json(
         { error: "userId and role are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,7 +43,7 @@ export async function POST(
     console.error("Error inviting user to board:", error);
     return NextResponse.json(
       { error: "Error inviting user to board." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
