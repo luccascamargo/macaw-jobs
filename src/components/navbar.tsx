@@ -45,9 +45,12 @@ export function Navbar({
   return (
     <nav className="p-4 flex justify-end items-center">
       <div className="flex items-center gap-2">
-        <div className="flex -space-x-2 overflow-hidden">
+        <div className="flex -space-x-1 overflow-hidden">
           {boardUsers.map((user) => (
-            <Avatar key={user.id} className="h-8 w-8 border-2 border-primary">
+            <Avatar
+              key={user.id}
+              className="h-8 w-8 border-2 border-primary text-sm"
+            >
               <AvatarFallback>
                 {`${getInitials(user.name)}${getInitials(user.lastname)}`}
               </AvatarFallback>

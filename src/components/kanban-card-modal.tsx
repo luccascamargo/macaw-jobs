@@ -45,7 +45,7 @@ interface KanbanCardModalProps {
     description: string,
     assignees: User[],
     priority: string,
-    columnId: string
+    columnId: string,
   ) => void;
   assignees?: User[];
 }
@@ -152,7 +152,7 @@ export function KanbanCardModal({
           setComment("");
           refetchComments();
         },
-      }
+      },
     );
   };
 
@@ -169,7 +169,7 @@ export function KanbanCardModal({
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-2xl font-bold border-none focus-visible:ring-transparent focus-visible:ring-offset-0 p-0 h-auto"
+              className="text-2xl max-w-2xl font-bold"
               placeholder="Título da Tarefa"
             />
           </div>
@@ -346,10 +346,12 @@ export function KanbanCardModal({
                         <div className="flex items-center gap-2">
                           <Avatar className="w-6 h-6">
                             <AvatarFallback>
-                              {getInitials(user.name)}
+                              {`${getInitials(user.name)}${getInitials(user.lastname)}`}
                             </AvatarFallback>
                           </Avatar>
-                          <span>{user.name}</span>
+                          <span>
+                            {user.name} {user.lastname}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
@@ -381,7 +383,7 @@ export function KanbanCardModal({
                           className="opacity-50 group-hover:opacity-100"
                           onClick={() =>
                             setSelectedUsers(
-                              selectedUsers.filter((su) => su.id !== user.id)
+                              selectedUsers.filter((su) => su.id !== user.id),
                             )
                           }
                         >

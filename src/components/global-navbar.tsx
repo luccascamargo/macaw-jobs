@@ -43,7 +43,7 @@ export function GlobalNavbar() {
           href="/"
           className="text-xl font-bold text-gray-900 hover:text-gray-700 transition"
         >
-          Macaw Jobs
+          Jobs
         </Link>
 
         <div className="flex items-center gap-4">

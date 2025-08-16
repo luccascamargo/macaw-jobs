@@ -99,7 +99,7 @@ export function KanbanColumn({
           items={column.tasks.map((task) => task.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="space-y-3 min-h-[200px] max-h-[calc(80vh-120px)] overflow-y-auto pr-2">
+          <div className="space-y-3 max-h-[calc(80vh-120px)] overflow-y-auto p-2">
             {column.tasks.map((task) => (
               <KanbanCard
                 key={task.id}

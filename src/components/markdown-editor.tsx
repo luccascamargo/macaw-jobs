@@ -25,7 +25,7 @@ export const MarkdownEditor: FC<EditorProps> = ({
       onChange={onChange}
       ref={editorRef}
       markdown={markdown}
-      className="border rounded"
+      className="border shadow-xs"
       plugins={[
         toolbarPlugin({
           toolbarClassName: "tollbar-card",
